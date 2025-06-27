@@ -1,0 +1,43 @@
+name: Deploy
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install elm
+        run: npm install -g elm
+      - name: Build
+        run: elm make src/Main.elm --optimize --output=elm.js
+      - name: Copy static files
+        run: |
+          mkdir dist
+          cp index.html elm.js dist/
+      - name: Upload artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "dist"
+      - name: Deploy to github pages
+        id: deployment
+        uses: actions/deploy-pages@v4
