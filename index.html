@@ -5,6 +5,12 @@
         <title>x86_64 utilities</title>
     </head>
     <body>
+        <div id="content"></div>
         <script src="elm.js"></script>
+        <script>
+            var app = Elm.Main.init({
+                node: document.getElementById('content')
+            });
+        </script>
     </body>
 </html>
